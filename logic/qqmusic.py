@@ -110,6 +110,8 @@ def fetch_playlist_data(tid):
         
     except Exception as e:
         print(f"Fetch playlist data error: {e}")
+        import traceback
+        traceback.print_exc()
         return None
 
 def fetch_playlist_page(tid, begin, num):
@@ -155,9 +157,17 @@ def fetch_playlist_page(tid, begin, num):
                 except:
                     pass
         except Exception as e:
+            print(f"Platform {platform} Request Failed: {e}")
+            if 'resp' in locals():
+                 print(f"Response status: {resp.status_code}")
+                 print(f"Response content: {resp.content}")
+            pass
+        except Exception as e:
             # print(f"Platform {platform} failed: {e}")
             pass
             
+    # If we fall through loop, it means no platform worked.
+    print(f"All platforms failed for tid {tid}. Likely IP block or invalid params.")
     return None
 
 def build_song_list(resp, detailed):
