@@ -21,9 +21,7 @@ from utils import common
 def music_handler():
     raw_link = request.form.get('url')
     # Pre-process: Extract URL from text (handles sharing text from apps)
-    print(f"DEBUG: raw_link received: {raw_link}")
     link = common.standard_url(raw_link) if raw_link else ""
-    print(f"DEBUG: processed link: {link}")
     
     detailed = request.args.get('detailed') == 'true'
     fmt = request.args.get('format')
