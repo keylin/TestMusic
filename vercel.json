@@ -1,0 +1,12 @@
+{
+    "rewrites": [
+        {
+            "source": "/songlist",
+            "destination": "/api/index"
+        },
+        {
+            "source": "/export/excel",
+            "destination": "/api/index"
+        }
+    ]
+}
