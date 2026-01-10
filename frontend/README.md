@@ -1,4 +1,4 @@
-# go-music
+# MyMusic
 
 ## Project setup
 ```
