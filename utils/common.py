@@ -5,7 +5,7 @@ from urllib.parse import urlparse, parse_qs
 brackets_pattern = r'（|）'
 misc_pattern = r'\s?【.*】'
 net_easy_v2 = r'163cn'
-shard_model = r'https?://[a-zA-Z0-9\.\/\?\:@\-_=#&%]+'
+shard_model = r'https?://[a-zA-Z0-9\.\/\?\:@\-_=#&%\*]+'
 restful_model = r'playlist/(\d+)'
 
 brackets_regex = re.compile(brackets_pattern)
