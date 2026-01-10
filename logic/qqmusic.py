@@ -143,7 +143,9 @@ def fetch_playlist_page(tid, begin, num):
         url = QQ_MUSIC_API_URL.format(signature, int(time.time() * 1000))
         
         try:
-            resp = httputil.post(url, data=param_str)
+            # Add Referer header which is often required for cloud IPs
+            headers = {"Referer": "https://y.qq.com/"}
+            resp = httputil.post(url, data=param_str, headers=headers)
             if len(resp.content) != 108: # Error response length check from Go code
                 try:
                     # Check if response is actually valid JSON and successful
