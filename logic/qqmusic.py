@@ -145,7 +145,13 @@ def fetch_playlist_page(tid, begin, num):
         try:
             resp = httputil.post(url, data=param_str)
             if len(resp.content) != 108: # Error response length check from Go code
-                return resp.content
+                try:
+                    # Check if response is actually valid JSON and successful
+                    data = json.loads(resp.content)
+                    if data.get('req_0', {}).get('data') and data.get('req_0', {}).get('code') == 0:
+                        return resp.content
+                except:
+                    pass
         except Exception as e:
             # print(f"Platform {platform} failed: {e}")
             pass
@@ -153,18 +159,29 @@ def fetch_playlist_page(tid, begin, num):
     return None
 
 def build_song_list(resp, detailed):
-    dirinfo = resp['req_0']['data']['dirinfo']
-    songlist = resp['req_0']['data']['songlist']
+    req_0 = resp.get('req_0', {})
+    data = req_0.get('data')
     
+    if not data:
+        code = req_0.get('code')
+        msg = req_0.get('msg', 'Unknown Error')
+        raise Exception(f"QQ Music API Error: {code} - {msg} (Possible IP restriction)")
+
+    dirinfo = data.get('dirinfo')
+    songlist = data.get('songlist')
+    
+    if not dirinfo or songlist is None:
+         raise Exception("Invalid Playlist Data from QQ Music")
+
     songs = []
     for song in songlist:
-        name = song['name']
+        name = song.get('name', 'Unknown')
         if not detailed:
             name = common.standard_song_name(name)
             
-        singers = [s['name'] for s in song.get('singer', [])]
+        singers = [s.get('name', '') for s in song.get('singer', [])]
         singer_str = " / ".join(singers)
         
         songs.append(f"{name} - {singer_str}")
         
-    return SongList(name=dirinfo['title'], songs=songs, songs_count=dirinfo['songnum'])
+    return SongList(name=dirinfo.get('title', 'Unknown Playlist'), songs=songs, songs_count=dirinfo.get('songnum', len(songs)))
