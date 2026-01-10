@@ -97,6 +97,11 @@ const isValidUrl = (url) => {
   }
 };
 
+const extractUrl = (text) => {
+  const match = text.match(/(https?:\/\/[^\s]+)/);
+  return match ? match[0] : text;
+};
+
 const throttle = (fn, delay) => {
   let lastTime = 0;
   return function (...args) {
@@ -115,11 +120,14 @@ const reset = (msg, type = 'error') => {
 
 // Actions
 const fetchLinkDetails = async () => {
-  const link = state.link.trim();
+  let link = state.link.trim();
   if (!link) {
     reset('请输入歌单链接', 'warning');
     return;
   }
+
+  // Extract URL if mixed text is provided
+  link = extractUrl(link);
   
   if (!isValidUrl(link)) {
     reset('链接格式无效', 'error');

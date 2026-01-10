@@ -14,10 +14,15 @@ FAILURE_CODE = 2
 import logging
 
 
+from utils import common
+
 # logger = logging.getLogger(__name__)
 
 def music_handler():
-    link = request.form.get('url')
+    raw_link = request.form.get('url')
+    # Pre-process: Extract URL from text (handles sharing text from apps)
+    link = common.standard_url(raw_link) if raw_link else ""
+    
     detailed = request.args.get('detailed') == 'true'
     fmt = request.args.get('format')
     order = request.args.get('order')

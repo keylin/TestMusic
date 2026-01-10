@@ -5,13 +5,13 @@ from urllib.parse import urlparse, parse_qs
 brackets_pattern = r'（|）'
 misc_pattern = r'\s?【.*】'
 net_easy_v2 = r'163cn'
-shard_model = r'http[s]?://[^ ]+'
+shard_model = r'https?://[a-zA-Z0-9\.\/\?\:@\-_=#&%]+'
 restful_model = r'playlist/(\d+)'
 
 brackets_regex = re.compile(brackets_pattern)
 misc_regex = re.compile(misc_pattern)
 net_easy_v2_regex = re.compile(net_easy_v2)
-shard_model_regex = re.compile(shard_model)
+shard_model_regex = re.compile(shard_model, re.IGNORECASE)
 restful_mode_regex = re.compile(restful_model)
 
 def get_qq_music_param(link):
