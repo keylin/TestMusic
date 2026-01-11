@@ -7,7 +7,7 @@ NET_EASY_URL_V6 = "https://music.163.com/api/v6/playlist/detail"
 NET_EASY_URL_V3 = "https://music.163.com/api/v3/song/detail"
 CHUNK_SIZE = 400
 
-def net_easy_discover(link, detailed):
+def net_easy_discover(link):
     # 1. Get playlist basic info
     song_ids_resp = get_songs_info(link)
     if not song_ids_resp:
@@ -27,7 +27,7 @@ def net_easy_discover(link, detailed):
     all_song_ids = [track['id'] for track in track_ids]
     
     # Fetch details
-    song_details = batch_get_songs(all_song_ids, detailed)
+    song_details = batch_get_songs(all_song_ids)
     
     # Sort songs based on original order
     songs = []
@@ -52,12 +52,12 @@ def get_songs_info(link):
         
     return data
 
-def batch_get_songs(song_ids, detailed):
+def batch_get_songs(song_ids):
     results = {}
     chunks = [song_ids[i:i + CHUNK_SIZE] for i in range(0, len(song_ids), CHUNK_SIZE)]
     
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        future_to_chunk = {executor.submit(process_chunk, chunk, detailed): chunk for chunk in chunks}
+        future_to_chunk = {executor.submit(process_chunk, chunk): chunk for chunk in chunks}
         for future in concurrent.futures.as_completed(future_to_chunk):
             try:
                 chunk_result = future.result()
@@ -67,7 +67,7 @@ def batch_get_songs(song_ids, detailed):
                 
     return results
 
-def process_chunk(chunk, detailed):
+def process_chunk(chunk):
     # Go's json.Marshal uses no spaces.
     c_param = json.dumps([{"id": x} for x in chunk], separators=(',', ':'))
     resp = httputil.post(NET_EASY_URL_V3, data={"c": c_param})
@@ -77,8 +77,7 @@ def process_chunk(chunk, detailed):
     songs = data.get("songs", [])
     for song in songs:
         name = song.get("name", "")
-        if not detailed:
-            name = common.standard_song_name(name)
+        name = common.standard_song_name(name)
             
         artists = [ar.get("name", "") for ar in song.get("ar", [])]
         author = " / ".join(artists)

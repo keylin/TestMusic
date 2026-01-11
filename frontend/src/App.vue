@@ -25,39 +25,14 @@
         </el-col>
       </el-row>
 
-      <!-- Options Section -->
-      <el-row :gutter="20" style="margin-bottom: 20px;">
-        <el-col :span="8">
-           <el-form-item label="格式:">
-            <el-select v-model="state.songFormat" placeholder="选择格式" size="default">
-              <el-option label="歌名 - 歌手" value="song-singer" />
-              <el-option label="歌手 - 歌名" value="singer-song" />
-              <el-option label="仅歌名" value="song" />
-            </el-select>
-           </el-form-item>
-        </el-col>
-        <el-col :span="8">
-           <el-form-item label="顺序:">
-             <el-select v-model="state.songOrder" placeholder="选择顺序" size="default">
-              <el-option label="正序" value="normal" />
-              <el-option label="倒序" value="reverse" />
-            </el-select>
-           </el-form-item>
-        </el-col>
-        <el-col :span="8" style="display: flex; align-items: center;">
-           <el-checkbox v-model="state.useDetailedSongName">保留原始歌名</el-checkbox>
-            <el-tooltip content="不勾选通常能获得更好的跨平台匹配率" placement="top">
-              <el-icon class="info-icon"><InfoFilled/></el-icon>
-            </el-tooltip>
-        </el-col>
-      </el-row>
+
 
       <!-- Result Section -->
       <transition name="el-fade-in-linear">
         <div v-if="state.result || state.songsCount > 0">
-           <el-divider content-position="center">解析结果 (共 {{ state.songsCount }} 首)</el-divider>
+           <el-divider content-position="center">歌单内容 (共 {{ state.songsCount }} 首)</el-divider>
            
-           <el-input type="textarea" v-model="state.result" :rows="15" placeholder="解析结果将显示在这里..."></el-input>
+           <el-input type="textarea" v-model="state.result" :rows="15" placeholder="歌单内容将显示在这里..."></el-input>
            
            <div style="margin-top: 20px; text-align: center;">
              <el-button type="primary" size="large" @click="copyResult">一键复制</el-button>
@@ -74,16 +49,14 @@
 import { reactive } from 'vue';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
-import { InfoFilled } from '@element-plus/icons-vue';
+
 
 // State
 const state = reactive({
   link: '',
   result: '',
   songsCount: 0,
-  useDetailedSongName: false,
-  songFormat: 'song-singer',
-  songOrder: 'normal',
+
   loading: false,
 });
 
@@ -142,10 +115,8 @@ const fetchLinkDetails = async () => {
   params.append('url', link);
 
   try {
-    const queryParams = `?detailed=${state.useDetailedSongName}&format=${state.songFormat}&order=${state.songOrder}`;
-    
     // Relative path call
-    const resp = await axios.post('/songlist' + queryParams, params, {
+    const resp = await axios.post('/songlist', params, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     });
 
@@ -163,7 +134,7 @@ const fetchLinkDetails = async () => {
     state.result = songs.join('\n');
     state.songsCount = songs_count;
     state.loading = false;
-    ElMessage.success('解析成功');
+    ElMessage.success('获取成功');
 
   } catch (err) {
     console.error(err);

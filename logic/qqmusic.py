@@ -14,7 +14,7 @@ ID_PARAM_LINK_REGEX = re.compile(r'id=(\d+)')
 SHORT_LINK_REGEX = re.compile(r'fcgi-bin')
 DETAILS_LINK_REGEX = re.compile(r'details')
 
-def qq_music_discover(link, detailed):
+def qq_music_discover(link):
     tid = extract_playlist_id(link)
     if not tid:
         raise Exception("Invalid playlist link")
@@ -24,7 +24,7 @@ def qq_music_discover(link, detailed):
         raise Exception("Failed to fetch playlist data")
         
     resp = json.loads(data)
-    return build_song_list(resp, detailed)
+    return build_song_list(resp)
 
 def extract_playlist_id(link):
     match = PLAYLIST_LINK_REGEX.search(link)
@@ -170,7 +170,7 @@ def fetch_playlist_page(tid, begin, num):
     print(f"All platforms failed for tid {tid}. Likely IP block or invalid params.")
     return None
 
-def build_song_list(resp, detailed):
+def build_song_list(resp):
     req_0 = resp.get('req_0', {})
     data = req_0.get('data')
     
@@ -188,8 +188,7 @@ def build_song_list(resp, detailed):
     songs = []
     for song in songlist:
         name = song.get('name', 'Unknown')
-        if not detailed:
-            name = common.standard_song_name(name)
+        name = common.standard_song_name(name)
             
         singers = [s.get('name', '') for s in song.get('singer', [])]
         singer_str = " / ".join(singers)

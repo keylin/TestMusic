@@ -7,7 +7,7 @@ from models import SongList
 QISHUI_V3_REGEX = re.compile(r'https?://qishui\.douyin\.com/s/[a-zA-Z0-9]+/?')
 QISHUI_V1_REGEX = re.compile(r'https?://[a-zA-Z0-9./?=&_-]+')
 
-def qishui_music_discover(link, detailed):
+def qishui_music_discover(link):
     extracted_link = QISHUI_V3_REGEX.search(link)
     if extracted_link:
         link = extracted_link.group(0)
@@ -17,9 +17,9 @@ def qishui_music_discover(link, detailed):
     if resp.status_code != 200:
         raise Exception("Failed to fetch Qishui music page")
         
-    return parse_song_list(resp.text, detailed)
+    return parse_song_list(resp.text)
 
-def parse_song_list(html, detailed):
+def parse_song_list(html):
     soup = BeautifulSoup(html, 'html.parser')
     
     # Selectors from Go code:
@@ -52,8 +52,7 @@ def parse_song_list(html, detailed):
             if "•" in artist:
                 artist = artist.split("•")[0].strip()
                 
-            if not detailed:
-                title = common.standard_song_name(title)
+            title = common.standard_song_name(title)
                 
             songs.append(f"{title} - {artist}")
             
