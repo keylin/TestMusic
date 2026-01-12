@@ -69,6 +69,17 @@ debug_system() {
     echo -e "\n${YELLOW}[4] Curl Local Test:${NC}"
     curl -I http://127.0.0.1:8866 || echo "Curl failed."
     
+    echo -e "\n${YELLOW}[5] Firewall Check:${NC}"
+    if command -v ufw >/dev/null; then
+        echo "UFW Status:"
+        sudo ufw status | grep 8866 || echo "8866 not found in ufw rules (if ufw is active)"
+    else
+        echo "UFW not installed."
+    fi
+    
+    echo "Iptables Rules (Input chain):"
+    sudo iptables -L INPUT -n | grep 8866 || echo "No explicit allow rule in iptables for 8866 (might be okay if policy is ACCEPT)"
+    
     echo "========================================"
 }
 
