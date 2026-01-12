@@ -131,5 +131,5 @@ systemctl restart $SERVICE_NAME
 PUBLIC_IP=$(curl -s ifconfig.me || echo "YOUR_SERVER_IP")
 log "Deployment Successful!"
 log "Status: $(systemctl is-active $SERVICE_NAME)"
-log "Access your application at: http://$PUBLIC_IP:8888"
-log "Ensure port 8888 is open in your Security Group."
+log "Access your application at: http://$PUBLIC_IP:8866"
+log "Ensure port 8866 is open in your Security Group."

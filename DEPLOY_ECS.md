@@ -30,28 +30,30 @@ chmod +x deploy.sh
 sudo ./deploy.sh
 ```
 
-脚本将会：
-1.  自动安装 Python3, pip, Git, Node.js, npm。
-2.  克隆/更新代码到 `/root/MyMusic`。
-3.  创建虚拟环境并安装 Python 依赖。
-4.  编译 Vue 前端项目。
-5.  自动配置并启动 Systemd 后台服务。
+## 2. 运维管理 (manage.sh)
 
-## 2. 管理服务
+我们提供了一个统一的管理脚本 `manage.sh`，用于管理服务的启动、停止、重启和查看日志。
 
-我们提供了便捷脚本来管理服务状态：
+### 使用方法
 
-### 停止服务
+1.  上传 `manage.sh` 到服务器。
+2.  给予执行权限：`chmod +x manage.sh`。
+
+### 交互模式
+直接运行脚本，不带参数，将进入交互式菜单：
 ```bash
-chmod +x stop.sh
-sudo ./stop.sh
+sudo ./manage.sh
 ```
 
-### 重启服务
-```bash
-chmod +x restart.sh
-sudo ./restart.sh
-```
+### 命令行模式
+您也可以直接通过参数执行命令：
+
+- **启动**: `sudo ./manage.sh start`
+- **停止**: `sudo ./manage.sh stop`
+- **重启**: `sudo ./manage.sh restart`
+- **状态**: `sudo ./manage.sh status`
+- **日志**: `sudo ./manage.sh log`
+- **诊断**: `sudo ./manage.sh debug`
 
 ## 3. 防火墙设置 (必看)
 
@@ -60,17 +62,10 @@ sudo ./restart.sh
 1.  登录阿里云控制台 -> ECS -> 安全组。
 2.  找到实例关联的安全组，点击 "配置规则"。
 3.  添加一条 **入方向** 规则：
-    *   端口范围: `8888/8888`
+    *   端口范围: `8866/8866`
     *   授权对象: `0.0.0.0/0` (允许所有 IP 访问)
 
 ## 4. 访问项目
 
 脚本运行结束后，会提示您的访问地址：
-`http://<您的公网IP>:8888`
-
----
-
-## 常用运维命令
-
-- **查看服务状态**: `sudo systemctl status mymusic`
-- **查看日志**: `sudo journalctl -u mymusic -f`
+`http://<您的公网IP>:8866`
