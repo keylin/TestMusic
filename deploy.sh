@@ -58,7 +58,7 @@ if [ -d "$APP_DIR" ]; then
     LOCAL=$(git rev-parse HEAD)
     REMOTE=$(git rev-parse origin/main)
 
-    if [ "$LOCAL" == "$REMOTE" ]; then
+    if [ "$LOCAL" = "$REMOTE" ]; then
         log "Local version matches remote ($LOCAL). No update needed."
         
         # Check if service is actually running
@@ -70,7 +70,9 @@ if [ -d "$APP_DIR" ]; then
             # Continue to below steps to ensure service is configured/started
         fi
     else
-        log "New version found (Local: ${LOCAL:0:7}, Remote: ${REMOTE:0:7}). Updating..."
+        LOCAL_SHORT=$(echo $LOCAL | cut -c 1-7)
+        REMOTE_SHORT=$(echo $REMOTE | cut -c 1-7)
+        log "New version found (Local: $LOCAL_SHORT, Remote: $REMOTE_SHORT). Updating..."
         git reset --hard origin/main
     fi
 else
