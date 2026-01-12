@@ -1,0 +1,19 @@
+[Unit]
+Description=MyMusic Service
+After=network.target
+
+[Service]
+# Replace with your actual username
+User=root
+# Replace with the absolute path to your project
+WorkingDirectory=/root/MyMusic
+# Activate venv and run main.py
+# If you are using a different location, adjust accordingly. 
+# We assume the standard structure: .venv inside project root.
+ExecStart=/root/MyMusic/.venv/bin/python /root/MyMusic/main.py
+Environment="FLASK_DEBUG=false"
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

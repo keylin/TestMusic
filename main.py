@@ -23,4 +23,5 @@ app.add_url_rule('/songlist', view_func=music_handler, methods=['POST'])
 app.add_url_rule('/export/excel', view_func=excel_handler, methods=['POST'])
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8888, debug=True)
+    debug_mode = os.environ.get('FLASK_DEBUG', 'true').lower() == 'true'
+    app.run(host='0.0.0.0', port=8888, debug=debug_mode)
