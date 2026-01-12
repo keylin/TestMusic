@@ -10,7 +10,7 @@
           <el-form-item>
             <div style="display: flex; width: 100%;">
               <el-input v-model="state.link" size="large"
-                        placeholder="输入歌单链接 (支持网易云/QQ音乐/汽水音乐)"
+                        placeholder="输入歌单链接 (支持网易云/QQ音乐/汽水音乐/Apple Music)"
                         @keyup.enter="throttledFetchLinkDetails"
                         class="custom-input">
               </el-input>
@@ -30,7 +30,14 @@
       <!-- Result Section -->
       <transition name="el-fade-in-linear">
         <div v-if="state.result || state.songsCount > 0">
-           <el-divider content-position="center">歌单内容 (共 {{ state.songsCount }} 首)</el-divider>
+           <el-divider content-position="center">
+             <span v-if="state.duplicateCount > 0">
+               歌单内容 (共 {{ state.songsCount + state.duplicateCount }} 首，返回 {{ state.songsCount }} 首，去重 {{ state.duplicateCount }} 首)
+             </span>
+             <span v-else>
+               歌单内容 (共 {{ state.songsCount }} 首)
+             </span>
+           </el-divider>
            
            <el-input type="textarea" v-model="state.result" :rows="15" placeholder="歌单内容将显示在这里..."></el-input>
            
@@ -56,6 +63,7 @@ const state = reactive({
   link: '',
   result: '',
   songsCount: 0,
+  duplicateCount: 0,
 
   loading: false,
 });
@@ -110,6 +118,7 @@ const fetchLinkDetails = async () => {
   state.loading = true;
   state.result = '';
   state.songsCount = 0;
+  state.duplicateCount = 0;
 
   const params = new URLSearchParams();
   params.append('url', link);
@@ -125,7 +134,7 @@ const fetchLinkDetails = async () => {
       return;
     }
 
-    const { songs, songs_count } = resp.data.data;
+    const { songs, songs_count, duplicate_count } = resp.data.data;
     if (!songs || songs.length === 0) {
       reset('未找到歌曲，请检查链接是否正确或歌单是否公开');
       return;
@@ -133,6 +142,7 @@ const fetchLinkDetails = async () => {
 
     state.result = songs.join('\n');
     state.songsCount = songs_count;
+    state.duplicateCount = duplicate_count || 0;
     state.loading = false;
     ElMessage.success('获取成功');
 

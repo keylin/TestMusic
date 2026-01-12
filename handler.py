@@ -1,12 +1,13 @@
 import re
 from flask import request, jsonify
-from logic import neteasy, qqmusic, qishuimusic, excel_export
+from logic import neteasy, qqmusic, qishuimusic, applemusic, excel_export
 from models import Result
 
 # Regex patterns
 NET_EASY_REGEX = re.compile(r'(163cn)|(\.163\.)')
 QQ_MUSIC_REGEX = re.compile(r'.qq.')
 QISHUI_MUSIC_REGEX = re.compile(r'(qishui)|(douyin)')
+APPLE_MUSIC_REGEX = re.compile(r'music\.apple\.com')
 
 SUCCESS_CODE = 1
 FAILURE_CODE = 2
@@ -35,6 +36,8 @@ def music_handler():
             song_list = qqmusic.qq_music_discover(link)
         elif QISHUI_MUSIC_REGEX.search(link):
             song_list = qishuimusic.qishui_music_discover(link)
+        elif APPLE_MUSIC_REGEX.search(link):
+            song_list = applemusic.apple_music_discover(link)
         else:
             return jsonify(Result(code=FAILURE_CODE, msg="Unsupported link format", data=None).__dict__), 200
             
@@ -52,15 +55,19 @@ def deduplicate_songs(song_list):
         
     seen = set()
     unique_songs = []
+    duplicates_count = 0
     
     for song in song_list.songs:
         # Song string is already "Name - Singer"
         if song not in seen:
             seen.add(song)
             unique_songs.append(song)
+        else:
+            duplicates_count += 1
             
     song_list.songs = unique_songs
     song_list.songs_count = len(unique_songs)
+    song_list.duplicate_count = duplicates_count
 
 from flask import send_file
 

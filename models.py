@@ -6,6 +6,7 @@ class SongList:
     name: str = ""
     songs: List[str] = field(default_factory=list)
     songs_count: int = 0
+    duplicate_count: int = 0
 
 @dataclass
 class Result:
