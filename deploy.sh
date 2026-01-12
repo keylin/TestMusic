@@ -6,7 +6,7 @@
 
 # 1. Git Repository URL (REQUIRED)
 # Replace this with your actual repository URL
-REPO_URL="https://github.com/keylin/MyMusic.git"
+REPO_URL="https://gh-proxy.org/https://github.com/keylin/MyMusic.git"
 
 # 2. Installation Directory
 # The directory where the project will be cloned
