@@ -18,7 +18,7 @@
     **必填修改**:
     ```bash
     # 把这个换成你自己仓库的 http/https 地址
-    REPO_URL="https://github.com/your-username/MyMusic.git"
+    REPO_URL="https://github.com/keylin/MyMusic.git"
     ```
 
 ### 步骤 2: 运行脚本
@@ -37,7 +37,23 @@ sudo ./deploy.sh
 4.  编译 Vue 前端项目。
 5.  自动配置并启动 Systemd 后台服务。
 
-## 2. 防火墙设置 (必看)
+## 2. 管理服务
+
+我们提供了便捷脚本来管理服务状态：
+
+### 停止服务
+```bash
+chmod +x stop.sh
+sudo ./stop.sh
+```
+
+### 重启服务
+```bash
+chmod +x restart.sh
+sudo ./restart.sh
+```
+
+## 3. 防火墙设置 (必看)
 
 部署成功后，只能在服务器内部访问。要通过公网访问，您**必须**在阿里云控制台配置安全组。
 
@@ -47,7 +63,7 @@ sudo ./deploy.sh
     *   端口范围: `8888/8888`
     *   授权对象: `0.0.0.0/0` (允许所有 IP 访问)
 
-## 3. 访问项目
+## 4. 访问项目
 
 脚本运行结束后，会提示您的访问地址：
 `http://<您的公网IP>:8888`
@@ -57,6 +73,4 @@ sudo ./deploy.sh
 ## 常用运维命令
 
 - **查看服务状态**: `sudo systemctl status mymusic`
-- **重启服务**: `sudo systemctl restart mymusic`
 - **查看日志**: `sudo journalctl -u mymusic -f`
-- **停止服务**: `sudo systemctl stop mymusic`
