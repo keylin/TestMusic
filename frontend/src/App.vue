@@ -167,14 +167,13 @@ const copyResult = () => {
     ElMessage.warning('没有内容可复制');
     return;
   }
-  navigator.clipboard.writeText(state.result).then(() => {
-    ElMessage.success('已复制到剪贴板');
-  }).catch(() => {
-    // Fallback for non-secure context or failure
+
+  // Helper for fallback
+  const fallbackCopy = () => {
     try {
       const textarea = document.createElement('textarea');
       textarea.value = state.result;
-      textarea.style.position = 'fixed'; // Avoid scrolling to bottom
+      textarea.style.position = 'fixed';
       textarea.style.opacity = '0';
       document.body.appendChild(textarea);
       textarea.select();
@@ -190,7 +189,20 @@ const copyResult = () => {
       console.error('Fallback copy failed', err);
       ElMessage.error('复制失败，请手动复制');
     }
-  });
+  };
+
+  // Use Clipboard API if available
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(state.result).then(() => {
+      ElMessage.success('已复制到剪贴板');
+    }).catch((err) => {
+      console.warn('Clipboard API failed, trying fallback', err);
+      fallbackCopy();
+    });
+  } else {
+    // Direct fallback for HTTP / non-secure contexts
+    fallbackCopy();
+  }
 };
 
 const downloadCsv = async () => {
