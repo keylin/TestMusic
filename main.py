@@ -6,7 +6,7 @@ import logging
 # Configure logging
 logging.basicConfig(level=logging.INFO, stream=sys.stdout, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-from handler import music_handler, excel_handler
+from handler import music_handler, export_handler
 
 # Resolve paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -20,7 +20,7 @@ def index():
 
 # Register route
 app.add_url_rule('/songlist', view_func=music_handler, methods=['POST'])
-app.add_url_rule('/export/excel', view_func=excel_handler, methods=['POST'])
+app.add_url_rule('/export/csv', view_func=export_handler, methods=['POST'])
 
 if __name__ == '__main__':
     debug_mode = os.environ.get('FLASK_DEBUG', 'true').lower() == 'true'

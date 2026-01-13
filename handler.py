@@ -1,6 +1,6 @@
 import re
 from flask import request, jsonify
-from logic import neteasy, qqmusic, qishuimusic, applemusic, excel_export
+from logic import neteasy, qqmusic, qishuimusic, applemusic, csv_export
 from models import Result
 
 # Regex patterns
@@ -71,7 +71,7 @@ def deduplicate_songs(song_list):
 
 from flask import send_file
 
-def excel_handler():
+def export_handler():
     try:
         data = request.json
         songs = data.get('songs', [])
@@ -79,13 +79,13 @@ def excel_handler():
         if not songs:
             return jsonify(Result(code=FAILURE_CODE, msg="No songs to export", data=None).__dict__), 200
             
-        excel_io = excel_export.generate_excel(songs)
+        csv_io = csv_export.generate_csv(songs)
         
         return send_file(
-            excel_io,
-            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            csv_io,
+            mimetype='text/csv',
             as_attachment=True,
-            download_name='songlist.xlsx'
+            download_name='songlist.csv'
         )
     except Exception as e:
         return jsonify(Result(code=FAILURE_CODE, msg=str(e), data=None).__dict__), 200

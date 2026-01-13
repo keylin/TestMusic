@@ -11,6 +11,7 @@
             <div style="display: flex; width: 100%;">
               <el-input v-model="state.link" size="large"
                         placeholder="输入歌单链接 (支持网易云/QQ音乐/汽水音乐/Apple Music)"
+                        clearable
                         @keyup.enter="throttledFetchLinkDetails"
                         class="custom-input">
               </el-input>
@@ -43,12 +44,16 @@
            
            <div style="margin-top: 20px; text-align: center;">
              <el-button type="primary" size="large" @click="copyResult">一键复制</el-button>
-             <el-button type="success" size="large" @click="downloadExcel" style="margin-left: 10px;">下载表格</el-button>
+             <el-button type="success" size="large" @click="downloadCsv" style="margin-left: 10px;">下载 CSV</el-button>
            </div>
         </div>
       </transition>
 
     </el-main>
+    
+    <div style="position: fixed; bottom: 10px; right: 20px; color: #aaa; font-size: 12px; z-index: 999;">
+       Version: {{ version }}
+    </div>
   </el-container>
 </template>
 
@@ -56,6 +61,8 @@
 import { reactive } from 'vue';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
+
+const version = process.env.VUE_APP_VERSION;
 
 
 // State
@@ -163,18 +170,30 @@ const copyResult = () => {
   navigator.clipboard.writeText(state.result).then(() => {
     ElMessage.success('已复制到剪贴板');
   }).catch(() => {
-    // Fallback
-    const textarea = document.createElement('textarea');
-    textarea.value = state.result;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-    ElMessage.success('已复制到剪贴板');
+    // Fallback for non-secure context or failure
+    try {
+      const textarea = document.createElement('textarea');
+      textarea.value = state.result;
+      textarea.style.position = 'fixed'; // Avoid scrolling to bottom
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textarea);
+      
+      if (successful) {
+         ElMessage.success('已复制到剪贴板'); 
+      } else {
+         ElMessage.error('复制失败，请手动复制');
+      }
+    } catch (err) {
+      console.error('Fallback copy failed', err);
+      ElMessage.error('复制失败，请手动复制');
+    }
   });
 };
 
-const downloadExcel = async () => {
+const downloadCsv = async () => {
   if (!state.result) {
     ElMessage.warning('没有内容可下载');
     return;
@@ -182,7 +201,7 @@ const downloadExcel = async () => {
   
   try {
     const songs = state.result.split('\n');
-    const resp = await axios.post('/export/excel', { songs }, {
+    const resp = await axios.post('/export/csv', { songs }, {
       responseType: 'blob'
     });
     
@@ -190,7 +209,7 @@ const downloadExcel = async () => {
     const url = window.URL.createObjectURL(new Blob([resp.data]));
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'songlist.xlsx');
+    link.setAttribute('download', 'songlist.csv');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
