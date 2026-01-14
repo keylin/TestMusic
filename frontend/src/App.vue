@@ -44,7 +44,7 @@
            
            <div style="margin-top: 20px; text-align: center;">
              <el-button type="primary" size="large" @click="copyResult">一键复制</el-button>
-             <el-button type="success" size="large" @click="downloadCsv" style="margin-left: 10px;">下载 CSV</el-button>
+             <el-button type="success" size="large" @click="downloadCsv" style="margin-left: 10px;">下载歌单</el-button>
            </div>
         </div>
       </transition>
