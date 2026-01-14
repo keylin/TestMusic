@@ -30,14 +30,18 @@ def music_handler():
         # ... existing logic ...
         if NET_EASY_REGEX.search(link):
             song_list = neteasy.net_easy_discover(link)
+            song_list.platform = "网易云"
         elif QQ_MUSIC_REGEX.search(link):
             if link == "https://i.y.qq.com/v8/playsong.html":
                  return jsonify(Result(code=FAILURE_CODE, msg="Invalid link", data=None).__dict__), 200
             song_list = qqmusic.qq_music_discover(link)
+            song_list.platform = "QQ音乐"
         elif QISHUI_MUSIC_REGEX.search(link):
             song_list = qishuimusic.qishui_music_discover(link)
+            song_list.platform = "汽水音乐"
         elif APPLE_MUSIC_REGEX.search(link):
             song_list = applemusic.apple_music_discover(link)
+            song_list.platform = "Apple Music"
         else:
             return jsonify(Result(code=FAILURE_CODE, msg="Unsupported link format", data=None).__dict__), 200
             

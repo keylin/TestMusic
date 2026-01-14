@@ -71,6 +71,7 @@ const state = reactive({
   result: '',
   songsCount: 0,
   duplicateCount: 0,
+  platform: '',
 
   loading: false,
 });
@@ -88,6 +89,21 @@ const isValidUrl = (url) => {
 const extractUrl = (text) => {
   const match = text.match(/(https?:\/\/[^\s]+)/);
   return match ? match[0] : text;
+};
+
+const formatTime = (date) => {
+  const pad = (n) => n.toString().padStart(2, '0');
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  const hour = pad(date.getHours());
+  const minute = pad(date.getMinutes());
+  const second = pad(date.getSeconds());
+  
+  // Use Fraction Slash (⁄) and Modifier Letter Colon (꞉)
+  // These look very similar to standard separators but are valid in filenames
+  // and won't be sanitized by the browser/OS.
+  return `${year}⁄${month}⁄${day} ${hour}꞉${minute}꞉${second}`;
 };
 
 const throttle = (fn, delay) => {
@@ -126,6 +142,7 @@ const fetchLinkDetails = async () => {
   state.result = '';
   state.songsCount = 0;
   state.duplicateCount = 0;
+  state.platform = '';
 
   const params = new URLSearchParams();
   params.append('url', link);
@@ -141,7 +158,7 @@ const fetchLinkDetails = async () => {
       return;
     }
 
-    const { songs, songs_count, duplicate_count } = resp.data.data;
+    const { songs, songs_count, duplicate_count, platform } = resp.data.data;
     if (!songs || songs.length === 0) {
       reset('未找到歌曲，请检查链接是否正确或歌单是否公开');
       return;
@@ -150,6 +167,7 @@ const fetchLinkDetails = async () => {
     state.result = songs.join('\n');
     state.songsCount = songs_count;
     state.duplicateCount = duplicate_count || 0;
+    state.platform = platform || '歌单';
     state.loading = false;
     ElMessage.success('获取成功');
 
@@ -218,10 +236,15 @@ const downloadCsv = async () => {
     });
     
     // Create download link
+    const now = new Date();
+    const formattedTime = formatTime(now);
+    // Format: [Platform]YYYY/MM/DD HH:mm:ss.csv
+    const filename = `[${state.platform}]${formattedTime}.csv`;
+
     const url = window.URL.createObjectURL(new Blob([resp.data]));
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'songlist.csv');
+    link.setAttribute('download', filename);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
